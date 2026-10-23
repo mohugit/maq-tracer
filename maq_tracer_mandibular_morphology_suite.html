@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MaQ Tracer | © 2026 MaqaTech — Mandibular Morphology Suite</title>
+  <style>
+    :root {
+      /* Core surfaces */
+      --bg: #0a0e17;
+      --panel: #0f1420;
+      --surface: #151c2b;
+      --surface-2: #1a2232;
+      --border: #263048;
+      --border-soft: #1d2638;
+
+      /* Brand accent */
+      --accent: #38bdf8;
+      --accent-dim: #0ea5e9;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+
+      /* Clinical side coding — Right = Green, Left = Red (semantic, do not change) */
+      --right: #22c55e;
+      --right-strong: #16a34a;
+      --right-soft: rgba(34, 197, 94, 0.14);
+      --left: #f87171;
+      --left-strong: #dc2626;
+      --left-soft: rgba(248, 113, 113, 0.14);
+
+      /* Status accents */
+      --warn: #f59e0b;
+      --warn-strong: #d97706;
+      --danger: #ef4444;
+      --danger-strong: #b91c1c;
+
+      /* Text */
+      --text: #f1f5f9;
+      --text-dim: #93a0b5;
+      --text-faint: #5b6679;
+
+      /* Shape & elevation */
+      --radius-lg: 12px;
+      --radius: 9px;
+      --radius-sm: 6px;
+      --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.25);
+      --shadow-card: 0 6px 18px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: grid;
+      grid-template-columns: 410px 1fr;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===================== Sidebar shell ===================== */
+    .sidebar {
+      background: var(--panel);
+      padding: 14px;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 10;
+    }
+    .sidebar::-webkit-scrollbar { width: 8px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+    /* ===================== Brand header ===================== */
+    .app-title-box {
+      background: linear-gradient(180deg, #161f30 0%, #0f1520 100%);
+      padding: 12px 14px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-card);
+    }
+    .brand-title {
+      margin: 0;
+      font-size: 1.12rem;
+      font-weight: 800;
+      letter-spacing: 0.1px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-badge {
+      font-size: 0.63rem;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 2px 7px;
+      border-radius: 20px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    p.sub { margin: 3px 0 0 0; font-size: 0.7rem; color: var(--text-dim); font-weight: 500; }
+
+    /* ===================== Section cards (unified, numbered) ===================== */
+    .control-group {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+    }
+    .sec-header {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: #cbd5e1;
+      padding-bottom: 9px;
+      margin-bottom: 11px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sec-header .sec-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      flex: none;
+      border-radius: 5px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+    .sec-header .sec-icon { margin-left: auto; opacity: 0.5; font-size: 0.85rem; text-transform: none; letter-spacing: 0; }
+
+    .sec-1, .sec-2, .sec-3, .sec-4, .sec-5 { border-left: 1px solid var(--border); }
+
+    /* ===================== Form controls ===================== */
+    select, input[type="file"], input[type="text"], input[type="number"], button {
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    select:focus, input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: -1px;
+      border-color: transparent;
+    }
+    input[type="file"] { font-size: 0.74rem; color: var(--text-dim); padding: 6px 8px; }
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 1fr;
+      gap: 6px;
+    }
+
+    /* ===================== Buttons ===================== */
+    button {
+      background: var(--accent);
+      color: #071018;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.05s;
+    }
+    button:hover { filter: brightness(1.08); }
+    button:active { transform: translateY(1px); }
+    button.secondary { background: var(--surface-2); color: var(--text); font-weight: 600; border: 1px solid var(--border); }
+    button.new-case-btn {
+      background: var(--warn);
+      color: #1c1206;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 7px;
+      border: 1px solid var(--warn-strong);
+    }
+    button.save-btn { background: var(--right-strong); color: #ffffff; font-size: 0.84rem; padding: 8px; }
+    button.lib-btn { background: var(--accent-dim); color: #ffffff; }
+    button.danger { background: var(--danger-strong); color: #fff; }
+    .btn-row { display: flex; gap: 6px; }
+    .btn-row button { margin-bottom: 0; }
+
+    /* ===================== Side toggle: Right = Green, Left = Red ===================== */
+    .side-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .side-btn {
+      padding: 8px;
+      background: var(--panel);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.83rem;
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .side-btn.active-right {
+      background: var(--right-soft);
+      color: #ffffff;
+      border: 1px solid var(--right);
+      box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.25);
+    }
+    .side-btn.active-left {
+      background: var(--left-soft);
+      color: #ffffff;
+      border: 1px solid var(--left);
+      box-shadow: inset 0 0 0 1px rgba(248, 113, 113, 0.25);
+    }
+
+    /* ===================== Bilateral summary table ===================== */
+    table.bilateral-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin-top: 2px;
+      background: var(--panel);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    table.bilateral-table th, table.bilateral-table td {
+      border: 1px solid var(--border-soft);
+      padding: 6px;
+      text-align: center;
+    }
+    table.bilateral-table th.th-struct { background: var(--surface-2); color: #e2e8f0; font-weight: 700; }
+    table.bilateral-table th.th-right { background: rgba(34, 197, 94, 0.16); color: #86efac; font-weight: 700; }
+    table.bilateral-table th.th-left { background: rgba(248, 113, 113, 0.16); color: #fca5a5; font-weight: 700; }
+
+    .cell-active-right {
+      outline: 2px solid var(--right);
+      background: var(--right-soft) !important;
+    }
+    .cell-active-left {
+      outline: 2px solid var(--left);
+      background: var(--left-soft) !important;
+    }
+    .pill-r { color: var(--right); font-weight: 800; }
+    .pill-l { color: var(--left); font-weight: 800; }
+
+    .instructions {
+      font-size: 0.74rem;
+      color: #fcd34d;
+      background: var(--panel);
+      border: 1px solid var(--border-soft);
+      padding: 7px 9px;
+      border-radius: var(--radius-sm);
+      line-height: 1.4;
+    }
+
+    /* ===================== Footer ===================== */
+    .copyright-footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 8px 10px;
+      background: transparent;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      color: var(--text-faint);
+      letter-spacing: 0.2px;
+    }
+    .copyright-footer strong { color: var(--accent); }
+
+    /* ===================== Main viewport & floating toolbar ===================== */
+    .viewport-wrapper {
+      position: relative;
+      background: #020617;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+    .floating-toolbar {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 20, 32, 0.97);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 20;
+      box-shadow: var(--shadow-card);
+      white-space: nowrap;
+    }
+    .tool-btn {
+      width: auto;
+      margin: 0;
+      padding: 6px 11px;
+      font-size: 0.79rem;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+    .tool-btn.active {
+      background: var(--accent);
+      color: #071018;
+      border-color: var(--accent);
+      font-weight: 800;
+    }
+    .tool-btn.new-case-top {
+      background: var(--warn);
+      color: #1c1206;
+      border-color: var(--warn-strong);
+      font-weight: 800;
+    }
+    .tool-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      flex: none;
+    }
+    .zoom-readout {
+      font-size: 0.8rem;
+      font-weight: 800;
+      min-width: 44px;
+      text-align: center;
+      color: var(--accent);
+    }
+    .frozen-result-badge {
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--right-soft);
+      border: 1px solid var(--right);
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+      min-width: 175px;
+      text-align: center;
+    }
+    .shortcut-hint {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 20, 32, 0.92);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.73rem;
+      pointer-events: none;
+      z-index: 20;
+      white-space: nowrap;
+    }
+    canvas { display: block; width: 100%; height: 100%; }
+
+    /* ===================== Research Library modal ===================== */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 92%;
+      max-width: 1150px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface);
+    }
+    .modal-title { margin: 0; color: var(--text); font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .modal-body {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      background: var(--panel);
+    }
+    .lib-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .lib-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.79rem;
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .lib-table th, .lib-table td {
+      border: 1px solid var(--border-soft);
+      padding: 7px 8px;
+      text-align: center;
+    }
+    .lib-table th {
+      background: var(--surface-2);
+      color: #e2e8f0;
+      position: sticky;
+      top: 0;
+      font-weight: 700;
+    }
+    .lib-table th.lib-th-right { background: rgba(34, 197, 94, 0.16); color: #86efac; }
+    .lib-table th.lib-th-left { background: rgba(248, 113, 113, 0.16); color: #fca5a5; }
+    .lib-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .lib-table tr:hover { background: rgba(56, 189, 248, 0.06); }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <!-- Brand Header -->
+    <div class="app-title-box">
+      <div>
+        <div class="brand-title">
+          <span>MaQ Tracer</span>
+          <span class="brand-badge">v1.0 Online</span>
+        </div>
+        <p class="sub">Mandibular Morphology Suite • © MaqaTech 2026</p>
+      </div>
+      <button id="topSidebarNewCaseBtn" class="new-case-btn" style="width:auto; margin:0; padding:7px 11px;" title="Start a fresh patient case">
+        🆕 New Case
+      </button>
+    </div>
+
+    <!-- SECTION 1: Patient Demographics & Image Upload -->
+    <div class="control-group sec-1">
+      <div class="sec-header">
+        <span class="sec-num">1</span>
+        <span>Patient Info &amp; X-Ray</span>
+        <span class="sec-icon">🏥</span>
+      </div>
+      <button id="newCaseBtn" class="new-case-btn" style="margin-bottom:7px;">
+        🆕 Start New Case (Clear Patient & X-Ray)
+      </button>
+      <input type="text" id="patientNameInput" placeholder="Patient Name / الاسم (e.g. احلام خالد مريط)" dir="auto">
+      <div class="form-grid-3">
+        <input type="text" id="patientIdInput" placeholder="Chart # (11921)">
+        <input type="number" id="patientAgeInput" placeholder="Age (30)">
+        <select id="patientGenderInput">
+          <option value="Female">Female (أنثى)</option>
+          <option value="Male">Male (ذكر)</option>
+        </select>
+      </div>
+      <input type="file" id="imageLoader" accept="image/*">
+      <label style="margin:2px 0 0 0; display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.77rem; color:#bfdbfe;">
+        <input type="checkbox" id="edgeSnap" checked style="width:auto; margin:0;"> 
+        <span><strong>Auto-Snap to Cortical Bone Edge</strong> (Deterministic)</span>
+      </label>
+    </div>
+
+    <!-- SECTION 2: Side & Structure Selector -->
+    <div class="control-group sec-2">
+      <div class="sec-header">
+        <span class="sec-num">2</span>
+        <span>Select Side &amp; Structure</span>
+        <span class="sec-icon">🎯</span>
+      </div>
+      <div class="side-toggle">
+        <button id="sideRightBtn" class="side-btn active-right">🟢 Right Side (R)</button>
+        <button id="sideLeftBtn" class="side-btn">🔴 Left Side (L)</button>
+      </div>
+
+      <select id="structureMode">
+        <option value="condyle">a) Condyle (5 Pts — 6 Shapes)</option>
+        <option value="coronoid">b) Coronoid Process (5 Pts — 4 Shapes)</option>
+        <option value="notch">c) Sigmoid Notch (5 Pts — 3 Shapes)</option>
+      </select>
+
+      <div class="instructions" id="modeInstructions"></div>
+    </div>
+
+    <!-- SECTION 3: Landmark Actions -->
+    <div class="control-group sec-3">
+      <div class="sec-header">
+        <span class="sec-num">3</span>
+        <span>Active Contour Controls</span>
+        <span class="sec-icon">✏️</span>
+      </div>
+      <div class="btn-row" style="margin-bottom:7px;">
+        <button id="undoBtn" class="secondary">↩ Undo Pt</button>
+        <button id="clearActiveBtn" class="secondary">✖ Clear Current</button>
+        <button id="clearAllBtn" class="danger">🗑 Reset Points</button>
+      </div>
+      <div id="activeMetrics" style="font-size:0.77rem; color:#e9d5ff; min-height:32px; background:rgba(0,0,0,0.3); padding:6px 8px; border-radius:6px;"></div>
+    </div>
+
+    <!-- SECTION 4: Bilateral Live Table -->
+    <div class="control-group sec-4">
+      <div class="sec-header">
+        <span class="sec-num">4</span>
+        <span>Live Bilateral Results <span style="opacity:.6; text-transform:none; font-weight:500;">(click a cell)</span></span>
+        <span class="sec-icon">📊</span>
+      </div>
+      <table class="bilateral-table">
+        <thead>
+          <tr>
+            <th class="th-struct">Structure</th>
+            <th class="th-right">Right (R)</th>
+            <th class="th-left">Left (L)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Condyle</strong></td>
+            <td id="cell_R_condyle" class="pill-r">—</td>
+            <td id="cell_L_condyle" class="pill-l">—</td>
+          </tr>
+          <tr>
+            <td><strong>Coronoid</strong></td>
+            <td id="cell_R_coronoid" class="pill-r">—</td>
+            <td id="cell_L_coronoid" class="pill-l">—</td>
+          </tr>
+          <tr>
+            <td><strong>Sigmoid Notch</strong></td>
+            <td id="cell_R_notch" class="pill-r">—</td>
+            <td id="cell_L_notch" class="pill-l">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECTION 5: Research Library & Export Controls -->
+    <div class="control-group sec-5">
+      <div class="sec-header">
+        <span class="sec-num">5</span>
+        <span>Research Library &amp; Export</span>
+        <span class="sec-icon">💾</span>
+      </div>
+      <button id="savePatientBtn" class="save-btn" style="margin-bottom:6px;">
+        💾 Save Patient to Research Library
+      </button>
+      <button id="openLibraryBtn" class="lib-btn" style="margin-bottom:6px;">
+        📚 Open Patient Library (<span id="libCount">0</span> Saved)
+      </button>
+      <div class="btn-row">
+        <button id="exportCsvBtn" class="secondary">📊 Export Excel/SPSS</button>
+        <button id="saveImgBtn" class="secondary">📷 Save Traced Image</button>
+      </div>
+    </div>
+
+    <!-- Official Copyright Footer -->
+    <div class="copyright-footer">
+      <strong>MaQ Tracer</strong> • Copyright © 2026 <strong>MaqaTech</strong>. All Rights Reserved.
+    </div>
+  </div>
+
+  <!-- Main X-Ray Viewport -->
+  <div class="viewport-wrapper" id="viewport">
+    <div class="floating-toolbar">
+      <button class="tool-btn new-case-top" id="toolbarNewCaseBtn" title="Clear current patient and start a new case">🆕 New Case</button>
+      <span class="tool-sep"></span>
+      <button class="tool-btn active" id="pointModeBtn">📍 Point Mode</button>
+      <button class="tool-btn" id="panModeBtn">✋ Hand (Move)</button>
+      <span class="tool-sep"></span>
+      <button class="tool-btn" id="zoomOutBtn">➖</button>
+      <span class="zoom-readout" id="zoomReadout">100%</span>
+      <button class="tool-btn" id="zoomInBtn">➕</button>
+      <button class="tool-btn" id="resetViewBtn">Fit</button>
+      <span class="tool-sep"></span>
+      <div class="frozen-result-badge" id="frozenBadge">
+        R-Condyle: 0/5 pts
+      </div>
+    </div>
+
+    <canvas id="xrayCanvas"></canvas>
+
+    <div class="shortcut-hint">
+      <strong>MaQ Tracer (© MaqaTech 2026)</strong> &nbsp;|&nbsp; <strong>Wheel</strong>: Zoom &nbsp;|&nbsp; <strong>Spacebar + Drag</strong>: Move &nbsp;|&nbsp; <strong style="color:#4ade80;">● Green = Right (R)</strong> &nbsp;|&nbsp; <strong style="color:#f87171;">● Dark Red = Left (L)</strong>
+    </div>
+  </div>
+
+  <!-- Research Library Modal -->
+  <div class="modal-overlay" id="libraryModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">📚 MaQ Tracer &mdash; Research Patient Library</h2>
+          <p class="sub">Powered by MaqaTech © 2026 • Stored in browser database for Excel, SPSS, or JSON backup.</p>
+        </div>
+        <button id="closeLibraryBtn" class="secondary" style="width:auto; margin:0; padding:6px 14px;">✖ Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="lib-controls">
+          <input type="text" id="searchLibInput" placeholder="🔍 Search by Patient Name or Chart No..." style="max-width:320px; margin:0;" dir="auto">
+          <button id="modalExportCsvBtn" class="save-btn" style="width:auto; margin:0; padding:7px 14px;">📊 Export Full CSV (Excel / SPSS)</button>
+          <button id="exportJsonBtn" class="secondary" style="width:auto; margin:0;">⬇ Backup JSON</button>
+          <button id="importJsonBtn" class="secondary" style="width:auto; margin:0;">⬆ Restore JSON</button>
+          <input type="file" id="jsonLoader" accept=".json" style="display:none;">
+          <button id="clearLibraryBtn" class="danger" style="width:auto; margin:0 0 0 auto;">🗑 Clear All</button>
+        </div>
+
+        <table class="lib-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Chart No.</th>
+              <th>Patient Name (الاسم)</th>
+              <th>Age / Sex</th>
+              <th class="lib-th-right">R-Condyle</th>
+              <th class="lib-th-left">L-Condyle</th>
+              <th class="lib-th-right">R-Coronoid</th>
+              <th class="lib-th-left">L-Coronoid</th>
+              <th class="lib-th-right">R-Notch</th>
+              <th class="lib-th-left">L-Notch</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="libraryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+const STORAGE_KEY = 'omfs_mandibular_research_library_v1';
+
+const RIGHT_BG = '#15803d';
+const RIGHT_BORDER = '#4ade80';
+const RIGHT_DOT = '#22c55e';
+
+const LEFT_BG = '#991b1b';
+const LEFT_BORDER = '#f87171';
+const LEFT_DOT = '#b91c1c';
+
+const viewport = document.getElementById('viewport');
+const canvas = document.getElementById('xrayCanvas');
+const ctx = canvas.getContext('2d');
+
+const patientNameInput = document.getElementById('patientNameInput');
+const patientIdInput = document.getElementById('patientIdInput');
+const patientAgeInput = document.getElementById('patientAgeInput');
+const patientGenderInput = document.getElementById('patientGenderInput');
+const imageLoader = document.getElementById('imageLoader');
+
+const structureMode = document.getElementById('structureMode');
+const modeInstructions = document.getElementById('modeInstructions');
+const edgeSnapCheckbox = document.getElementById('edgeSnap');
+const activeMetrics = document.getElementById('activeMetrics');
+const frozenBadge = document.getElementById('frozenBadge');
+
+const sideRightBtn = document.getElementById('sideRightBtn');
+const sideLeftBtn = document.getElementById('sideLeftBtn');
+
+const pointModeBtn = document.getElementById('pointModeBtn');
+const panModeBtn = document.getElementById('panModeBtn');
+const zoomInBtn = document.getElementById('zoomInBtn');
+const zoomOutBtn = document.getElementById('zoomOutBtn');
+const resetViewBtn = document.getElementById('resetViewBtn');
+const zoomReadout = document.getElementById('zoomReadout');
+
+const libraryModal = document.getElementById('libraryModal');
+const libraryTableBody = document.getElementById('libraryTableBody');
+const searchLibInput = document.getElementById('searchLibInput');
+const libCountSpan = document.getElementById('libCount');
+
+const offCanvas = document.createElement('canvas');
+const offCtx = offCanvas.getContext('2d');
+
+let img = new Image();
+let imageLoaded = false;
+let grayData = null;
+let currentCaseSaved = false;
+
+let scale = 1, panX = 0, panY = 0;
+let currentSide = 'R';
+let currentStructure = 'condyle';
+
+function createEmptyTracings() {
+  return {
+    R_condyle:  { side: 'R', structure: 'condyle',  label: 'R-Condyle',  points: [], shape: '—', metrics: null },
+    R_coronoid: { side: 'R', structure: 'coronoid', label: 'R-Coronoid', points: [], shape: '—', metrics: null },
+    R_notch:    { side: 'R', structure: 'notch',    label: 'R-Notch',    points: [], shape: '—', metrics: null },
+    L_condyle:  { side: 'L', structure: 'condyle',  label: 'L-Condyle',  points: [], shape: '—', metrics: null },
+    L_coronoid: { side: 'L', structure: 'coronoid', label: 'L-Coronoid', points: [], shape: '—', metrics: null },
+    L_notch:    { side: 'L', structure: 'notch',    label: 'L-Notch',    points: [], shape: '—', metrics: null }
+  };
+}
+
+let tracings = createEmptyTracings();
+let researchLibrary = loadLibraryFromStorage();
+
+let activeTool = 'point';
+let isSpacePressed = false;
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+let draggingPointIdx = -1;
+
+function loadLibraryFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveLibraryToStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(researchLibrary));
+  libCountSpan.textContent = researchLibrary.length;
+}
+saveLibraryToStorage();
+
+function getActiveKey() { return `${currentSide}_${currentStructure}`; }
+function getActiveTracing() { return tracings[getActiveKey()]; }
+
+function hasAnyPointsPlaced() {
+  return Object.values(tracings).some(t => t.points.length > 0);
+}
+
+function startNewCase() {
+  if (!currentCaseSaved && (hasAnyPointsPlaced() || patientNameInput.value.trim() !== '' || patientIdInput.value.trim() !== '')) {
+    if (!confirm("Start a New Case in MaQ Tracer? Any unsaved landmarks or patient info on the current screen will be cleared.")) {
+      return;
+    }
+  }
+
+  patientNameInput.value = '';
+  patientIdInput.value = '';
+  patientAgeInput.value = '';
+  patientGenderInput.value = 'Female';
+  imageLoader.value = '';
+
+  img = new Image();
+  imageLoaded = false;
+  grayData = null;
+  currentCaseSaved = false;
+
+  scale = 1;
+  panX = 0;
+  panY = 0;
+  zoomReadout.textContent = '100%';
+
+  currentSide = 'R';
+  currentStructure = 'condyle';
+  tracings = createEmptyTracings();
+
+  refreshTableUI();
+  updateSelectionUI();
+  redraw();
+  patientNameInput.focus();
+}
+
+document.getElementById('newCaseBtn').addEventListener('click', startNewCase);
+document.getElementById('topSidebarNewCaseBtn').addEventListener('click', startNewCase);
+document.getElementById('toolbarNewCaseBtn').addEventListener('click', startNewCase);
+
+function resizeViewport() {
+  canvas.width = viewport.clientWidth;
+  canvas.height = viewport.clientHeight;
+  updateCursor();
+  redraw();
+}
+window.addEventListener('resize', resizeViewport);
+resizeViewport();
+
+function updateSelectionUI() {
+  sideRightBtn.classList.toggle('active-right', currentSide === 'R');
+  sideLeftBtn.classList.toggle('active-left', currentSide === 'L');
+  structureMode.value = currentStructure;
+
+  const sideBadge = currentSide === 'R'
+    ? '<span style="color:#4ade80; font-weight:800;">Right Side (R - Green)</span>'
+    : '<span style="color:#f87171; font-weight:800;">Left Side (L - Dark Red)</span>';
+
+  const structMap = {
+    condyle: `Place <strong>5 landmarks</strong> on ${sideBadge} <strong>Condyle</strong>: (1) Neck, (2) Slope, (3) Top Peak, (4) Slope, (5) Neck.`,
+    coronoid: `Place <strong>5 landmarks</strong> on ${sideBadge} <strong>Coronoid</strong>: (1) Base, (2) Slope, (3) Apex/Tip, (4) Slope, (5) Base.`,
+    notch: `Place <strong>5 landmarks</strong> on ${sideBadge} <strong>Sigmoid Notch</strong>: (1) Condylar edge, (2) Wall, (3) Deepest Nadir, (4) Wall, (5) Coronoid edge.`
+  };
+  modeInstructions.innerHTML = structMap[currentStructure];
+
+  ['R_condyle','R_coronoid','R_notch','L_condyle','L_coronoid','L_notch'].forEach(k => {
+    const cell = document.getElementById(`cell_${k}`);
+    cell.classList.remove('cell-active-right', 'cell-active-left');
+    if (k === getActiveKey()) {
+      cell.classList.add(currentSide === 'R' ? 'cell-active-right' : 'cell-active-left');
+    }
+  });
+
+  updateActiveMetricsUI();
+  redraw();
+}
+
+sideRightBtn.addEventListener('click', () => { currentSide = 'R'; updateSelectionUI(); });
+sideLeftBtn.addEventListener('click', () => { currentSide = 'L'; updateSelectionUI(); });
+structureMode.addEventListener('change', () => { currentStructure = structureMode.value; updateSelectionUI(); });
+
+['R_condyle','R_coronoid','R_notch','L_condyle','L_coronoid','L_notch'].forEach(k => {
+  const cell = document.getElementById(`cell_${k}`);
+  cell.style.cursor = 'pointer';
+  cell.addEventListener('click', () => {
+    const [s, st] = k.split('_');
+    currentSide = s;
+    currentStructure = st;
+    updateSelectionUI();
+  });
+});
+
+function setTool(tool) {
+  activeTool = tool;
+  pointModeBtn.classList.toggle('active', tool === 'point');
+  panModeBtn.classList.toggle('active', tool === 'pan');
+  updateCursor();
+}
+pointModeBtn.addEventListener('click', () => setTool('point'));
+panModeBtn.addEventListener('click', () => setTool('pan'));
+
+function updateCursor() {
+  if (isPanning) canvas.style.cursor = 'grabbing';
+  else if (activeTool === 'pan' || isSpacePressed) canvas.style.cursor = 'grab';
+  else canvas.style.cursor = 'crosshair';
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !isSpacePressed && !['INPUT','SELECT'].includes(document.activeElement.tagName)) {
+    e.preventDefault();
+    isSpacePressed = true;
+    panModeBtn.classList.add('active');
+    pointModeBtn.classList.remove('active');
+    updateCursor();
+  }
+});
+window.addEventListener('keyup', (e) => {
+  if (e.code === 'Space') {
+    isSpacePressed = false;
+    setTool(activeTool);
+  }
+});
+
+function fitImageToViewport() {
+  if (!imageLoaded) return;
+  const pad = 30;
+  scale = Math.min((canvas.width - pad * 2) / img.width, (canvas.height - pad * 2) / img.height, 1.5);
+  panX = (canvas.width - img.width * scale) / 2;
+  panY = (canvas.height - img.height * scale) / 2;
+  zoomReadout.textContent = `${Math.round(scale * 100)}%`;
+  redraw();
+}
+
+function zoomAt(cx, cy, factor) {
+  if (!imageLoaded) return;
+  const newScale = Math.min(Math.max(scale * factor, 0.15), 10);
+  const actualFactor = newScale / scale;
+  panX = cx - (cx - panX) * actualFactor;
+  panY = cy - (cy - panY) * actualFactor;
+  scale = newScale;
+  zoomReadout.textContent = `${Math.round(scale * 100)}%`;
+  redraw();
+}
+
+zoomInBtn.addEventListener('click', () => zoomAt(canvas.width / 2, canvas.height / 2, 1.25));
+zoomOutBtn.addEventListener('click', () => zoomAt(canvas.width / 2, canvas.height / 2, 0.8));
+resetViewBtn.addEventListener('click', fitImageToViewport);
+
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  zoomAt(e.clientX - rect.left, e.clientY - rect.top, e.deltaY < 0 ? 1.15 : 0.87);
+}, { passive: false });
+
+function screenToImage(sx, sy) { return { x: (sx - panX) / scale, y: (sy - panY) / scale }; }
+function imageToScreen(ix, iy) { return { x: ix * scale + panX, y: iy * scale + panY }; }
+
+imageLoader.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    img.onload = () => {
+      imageLoaded = true;
+      currentCaseSaved = false;
+      offCanvas.width = img.width;
+      offCanvas.height = img.height;
+      offCtx.drawImage(img, 0, 0);
+      extractGrayscale();
+      tracings = createEmptyTracings();
+      refreshTableUI();
+      updateSelectionUI();
+      fitImageToViewport();
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
+function extractGrayscale() {
+  const w = offCanvas.width, h = offCanvas.height;
+  const imgData = offCtx.getImageData(0, 0, w, h).data;
+  grayData = new Float32Array(w * h);
+  for (let i = 0, n = w * h; i < n; i++) {
+    const idx = i * 4;
+    grayData[i] = 0.299 * imgData[idx] + 0.587 * imgData[idx + 1] + 0.114 * imgData[idx + 2];
+  }
+}
+
+function snapToBoneEdge(ix, iy) {
+  const w = offCanvas.width, h = offCanvas.height;
+  const clampedX = Math.max(0, Math.min(w - 1, Math.round(ix)));
+  const clampedY = Math.max(0, Math.min(h - 1, Math.round(iy)));
+  if (!grayData || !edgeSnapCheckbox.checked) return { x: clampedX, y: clampedY };
+
+  const radius = 12;
+  let bestX = clampedX, bestY = clampedY, maxGrad = -1;
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      const px = clampedX + dx, py = clampedY + dy;
+      if (px <= 1 || px >= w - 2 || py <= 1 || py >= h - 2) continue;
+      const gx =
+        -grayData[(py - 1) * w + (px - 1)] + grayData[(py - 1) * w + (px + 1)] +
+        -2 * grayData[py * w + (px - 1)] + 2 * grayData[py * w + (px + 1)] +
+        -grayData[(py + 1) * w + (px - 1)] + grayData[(py + 1) * w + (px + 1)];
+      const gy =
+        -grayData[(py - 1) * w + (px - 1)] - 2 * grayData[(py - 1) * w + px] - grayData[(py - 1) * w + (px + 1)] +
+         grayData[(py + 1) * w + (px - 1)] + 2 * grayData[(py + 1) * w + px] + grayData[(py + 1) * w + (px + 1)];
+      const grad = Math.hypot(gx, gy);
+      if (grad > maxGrad) { maxGrad = grad; bestX = px; bestY = py; }
+    }
+  }
+  return { x: bestX, y: bestY };
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  if (!imageLoaded) return;
+  const rect = canvas.getBoundingClientRect();
+  const sx = e.clientX - rect.left;
+  const sy = e.clientY - rect.top;
+
+  if (e.button === 1 || e.button === 2 || activeTool === 'pan' || isSpacePressed) {
+    isPanning = true;
+    panStart = { x: sx - panX, y: sy - panY };
+    updateCursor();
+    return;
+  }
+  if (e.button !== 0) return;
+
+  const activeT = getActiveTracing();
+  for (let i = 0; i < activeT.points.length; i++) {
+    const sp = imageToScreen(activeT.points[i].x, activeT.points[i].y);
+    if (Math.hypot(sx - sp.x, sy - sp.y) <= 10) {
+      draggingPointIdx = i;
+      return;
+    }
+  }
+
+  if (activeT.points.length < 5) {
+    const imgPt = screenToImage(sx, sy);
+    if (imgPt.x >= 0 && imgPt.x <= img.width && imgPt.y >= 0 && imgPt.y <= img.height) {
+      activeT.points.push(snapToBoneEdge(imgPt.x, imgPt.y));
+      currentCaseSaved = false;
+      if (activeT.points.length === 5) evaluateTracing(activeT);
+      updateActiveMetricsUI();
+      refreshTableUI();
+      redraw();
+    }
+  }
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!imageLoaded) return;
+  const rect = canvas.getBoundingClientRect();
+  const sx = e.clientX - rect.left;
+  const sy = e.clientY - rect.top;
+
+  if (isPanning) {
+    panX = sx - panStart.x;
+    panY = sy - panStart.y;
+    redraw();
+    return;
+  }
+
+  if (draggingPointIdx !== -1) {
+    const activeT = getActiveTracing();
+    const imgPt = screenToImage(sx, sy);
+    activeT.points[draggingPointIdx] = snapToBoneEdge(imgPt.x, imgPt.y);
+    currentCaseSaved = false;
+    if (activeT.points.length === 5) evaluateTracing(activeT);
+    updateActiveMetricsUI();
+    refreshTableUI();
+    redraw();
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  if (isPanning) { isPanning = false; updateCursor(); }
+  draggingPointIdx = -1;
+});
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+function dist(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+function angleDeg(a, b, c) {
+  const ab = { x: a.x - b.x, y: a.y - b.y };
+  const cb = { x: c.x - b.x, y: c.y - b.y };
+  const dot = ab.x * cb.x + ab.y * cb.y;
+  const mag = Math.hypot(ab.x, ab.y) * Math.hypot(cb.x, cb.y);
+  return (Math.acos(Math.max(-1, Math.min(1, dot / (mag || 1)))) * 180) / Math.PI;
+}
+
+function computeCurveLengthPx(pts) {
+  let len = 0;
+  for (let i = 0; i < pts.length - 1; i++) len += dist(pts[i], pts[i + 1]);
+  return len;
+}
+
+function evaluateTracing(t) {
+  if (t.points.length < 5) {
+    t.shape = '—';
+    t.metrics = null;
+    return;
+  }
+
+  let ordered = [...t.points];
+  const isRightSide = t.side === 'R';
+  if (isRightSide && ordered[0].x > ordered[4].x) ordered.reverse();
+  if (!isRightSide && ordered[0].x < ordered[4].x) ordered.reverse();
+
+  const [p1, p2, p3, p4, p5] = ordered;
+
+  const baseWidth = Math.max(dist(p1, p5), dist(p2, p4), 1);
+  const midBase = { x: (p1.x + p5.x) / 2, y: (p1.y + p5.y) / 2 };
+
+  const bottomY = Math.max(p2.y, p3.y, p4.y);
+  const height = t.structure === 'notch' ? Math.abs(bottomY - midBase.y) : dist(p3, midBase);
+  const aspectRatio = height / baseWidth;
+
+  const apexAngle = angleDeg(p2, p3, p4);
+  const postSlopeAngle = angleDeg(p1, p2, p3);
+  const antSlopeAngle = angleDeg(p3, p4, p5);
+
+  const roofSlope23 = Math.abs(p3.y - p2.y) / Math.max(Math.abs(p3.x - p2.x), 1);
+  const roofSlope34 = Math.abs(p4.y - p3.y) / Math.max(Math.abs(p4.x - p3.x), 1);
+  const hasFlatSuperiorRoof = (roofSlope34 < 0.18 && dist(p3, p4) > baseWidth * 0.35) ||
+                              (roofSlope23 < 0.18 && dist(p2, p3) > baseWidth * 0.35);
+
+  const midX = (p1.x + p5.x) / 2;
+  const peakX = (p2.x + p3.x + p4.x) / 3;
+  const horizontalSkew = Math.abs(peakX - midX) / baseWidth;
+  const antPostRatio = dist(p5, p3) / Math.max(dist(p1, p3), 1);
+  const arcLenPx = computeCurveLengthPx(t.points);
+
+  let classification = "";
+  if (t.structure === "condyle") {
+    const isCentralDip = p3.y > p2.y + 3.5 && p3.y > p4.y + 3.5;
+    if (isCentralDip) {
+      classification = "Bifid";
+    } else if (hasFlatSuperiorRoof || aspectRatio < 0.30 || apexAngle > 150) {
+      classification = "Flat";
+    } else if (antPostRatio < 0.74 && antSlopeAngle < 135) {
+      classification = "Bird-beak";
+    } else if (horizontalSkew > 0.22 && (antPostRatio > 1.42 || Math.abs(antSlopeAngle - postSlopeAngle) > 40)) {
+      classification = "Crooked Finger";
+    } else if (apexAngle < 116 && !hasFlatSuperiorRoof) {
+      classification = "Diamond";
+    } else {
+      classification = "Round";
+    }
+  } else if (t.structure === "coronoid") {
+    if (hasFlatSuperiorRoof || aspectRatio < 0.26 || apexAngle > 145) {
+      classification = "Flat";
+    } else if (antPostRatio < 0.78 || antSlopeAngle < 136) {
+      classification = "Beak";
+    } else if (apexAngle < 95) {
+      classification = "Triangular";
+    } else {
+      classification = "Round";
+    }
+  } else if (t.structure === "notch") {
+    const widthDepthRatio = baseWidth / Math.max(height, 1);
+    if (widthDepthRatio > 2.35) {
+      classification = "Wide";
+    } else if (antPostRatio < 0.78 || antPostRatio > 1.28) {
+      classification = "Sloping";
+    } else {
+      classification = "Round";
+    }
+  }
+
+  t.shape = classification;
+  t.metrics = {
+    aspectRatio: aspectRatio.toFixed(2),
+    apexAngle: apexAngle.toFixed(1),
+    antPostRatio: antPostRatio.toFixed(2),
+    arcLenPx: arcLenPx.toFixed(2)
+  };
+}
+
+function updateActiveMetricsUI() {
+  const t = getActiveTracing();
+  const isRight = t.side === 'R';
+  const sideTextColor = isRight ? RIGHT_BORDER : LEFT_BORDER;
+
+  frozenBadge.style.background = isRight ? '#14532d' : '#7f1d1d';
+  frozenBadge.style.borderColor = sideTextColor;
+
+  if (t.points.length < 5) {
+    activeMetrics.innerHTML = `<strong style="color:${sideTextColor};">${t.label}:</strong> Placed ${t.points.length}/5 landmarks...`;
+    frozenBadge.innerHTML = `${t.label}: ${t.points.length}/5 pts`;
+  } else if (t.metrics) {
+    activeMetrics.innerHTML = `
+      <strong style="color:${sideTextColor};">${t.label} → ${t.shape}</strong><br>
+      Curve: <strong>${t.metrics.arcLenPx} px</strong> | H/W: <strong>${t.metrics.aspectRatio}</strong> | Angle: <strong>${t.metrics.apexAngle}°</strong>
+    `;
+    frozenBadge.innerHTML = `${t.label}: ${t.shape} (${t.metrics.arcLenPx} px)`;
+  }
+}
+
+function refreshTableUI() {
+  Object.keys(tracings).forEach(k => {
+    const cell = document.getElementById(`cell_${k}`);
+    if (cell) cell.textContent = tracings[k].shape;
+  });
+}
+
+function redraw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!imageLoaded) {
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 20px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('MaQ Tracer — Mandibular Morphology Research Suite', canvas.width / 2, canvas.height / 2 - 14);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '14px system-ui, sans-serif';
+    ctx.fillText('Enter Patient Name/ID and upload a Panoramic X-Ray (OPG) to begin.  |  © 2026 MaqaTech', canvas.width / 2, canvas.height / 2 + 14);
+    return;
+  }
+
+  ctx.save();
+  ctx.translate(panX, panY);
+  ctx.scale(scale, scale);
+  ctx.drawImage(img, 0, 0);
+  ctx.restore();
+
+  Object.keys(tracings).forEach(key => {
+    const t = tracings[key];
+    if (t.points.length === 0) return;
+
+    const isActive = (key === getActiveKey());
+    const isRight = t.side === 'R';
+    const dotFill = isRight ? RIGHT_DOT : LEFT_DOT;
+    const labelColor = isRight ? RIGHT_BORDER : LEFT_BORDER;
+    const screenPts = t.points.map(p => imageToScreen(p.x, p.y));
+
+    if (screenPts.length >= 2) {
+      ctx.save();
+      ctx.strokeStyle = isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = isActive ? 2.8 : 2.0;
+      ctx.beginPath();
+      ctx.moveTo(screenPts[0].x, screenPts[0].y);
+      for (let i = 0; i < screenPts.length - 1; i++) {
+        const xc = (screenPts[i].x + screenPts[i + 1].x) / 2;
+        const yc = (screenPts[i].y + screenPts[i + 1].y) / 2;
+        ctx.quadraticCurveTo(screenPts[i].x, screenPts[i].y, xc, yc);
+      }
+      ctx.lineTo(screenPts[screenPts.length - 1].x, screenPts[screenPts.length - 1].y);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    screenPts.forEach((sp, idx) => {
+      ctx.fillStyle = dotFill;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = isActive ? 2.0 : 1.2;
+      ctx.beginPath();
+      ctx.arc(sp.x, sp.y, isActive ? 6 : 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      if (isActive) {
+        ctx.fillStyle = labelColor;
+        ctx.font = 'bold 13px system-ui, sans-serif';
+        ctx.fillText(`${idx + 1}`, sp.x + 8, sp.y - 7);
+      }
+    });
+  });
+}
+
+document.getElementById('undoBtn').addEventListener('click', () => {
+  const t = getActiveTracing();
+  if (t.points.length > 0) {
+    t.points.pop();
+    evaluateTracing(t);
+    updateActiveMetricsUI();
+    refreshTableUI();
+    redraw();
+  }
+});
+
+document.getElementById('clearActiveBtn').addEventListener('click', () => {
+  const t = getActiveTracing();
+  t.points = [];
+  evaluateTracing(t);
+  updateActiveMetricsUI();
+  refreshTableUI();
+  redraw();
+});
+
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+  if (!confirm("Reset all Right & Left landmarks on the current X-Ray?")) return;
+  tracings = createEmptyTracings();
+  updateActiveMetricsUI();
+  refreshTableUI();
+  redraw();
+});
+
+document.getElementById('savePatientBtn').addEventListener('click', () => {
+  const chartNo = patientIdInput.value.trim() || `OPG-${researchLibrary.length + 1}`;
+  const patientName = patientNameInput.value.trim() || 'Unnamed Patient';
+  const age = patientAgeInput.value.trim() || '—';
+  const gender = patientGenderInput.value;
+
+  const record = {
+    id: Date.now().toString(),
+    dateSaved: new Date().toISOString().split('T')[0],
+    chartNo,
+    patientName,
+    age,
+    gender,
+    R_Condyle: tracings.R_condyle.shape,
+    R_Condyle_Px: tracings.R_condyle.metrics ? tracings.R_condyle.metrics.arcLenPx : '',
+    R_Condyle_HW: tracings.R_condyle.metrics ? tracings.R_condyle.metrics.aspectRatio : '',
+    L_Condyle: tracings.L_condyle.shape,
+    L_Condyle_Px: tracings.L_condyle.metrics ? tracings.L_condyle.metrics.arcLenPx : '',
+    L_Condyle_HW: tracings.L_condyle.metrics ? tracings.L_condyle.metrics.aspectRatio : '',
+    R_Coronoid: tracings.R_coronoid.shape,
+    R_Coronoid_Px: tracings.R_coronoid.metrics ? tracings.R_coronoid.metrics.arcLenPx : '',
+    L_Coronoid: tracings.L_coronoid.shape,
+    L_Coronoid_Px: tracings.L_coronoid.metrics ? tracings.L_coronoid.metrics.arcLenPx : '',
+    R_Notch: tracings.R_notch.shape,
+    R_Notch_Px: tracings.R_notch.metrics ? tracings.R_notch.metrics.arcLenPx : '',
+    L_Notch: tracings.L_notch.shape,
+    L_Notch_Px: tracings.L_notch.metrics ? tracings.L_notch.metrics.arcLenPx : '',
+    rawTracings: JSON.parse(JSON.stringify(tracings))
+  };
+
+  const existingIdx = researchLibrary.findIndex(r => r.chartNo === chartNo && r.patientName === patientName);
+  if (existingIdx !== -1) {
+    if (confirm(`Patient "${patientName}" (Chart #${chartNo}) already exists in the MaQ Tracer library. Update existing record?`)) {
+      researchLibrary[existingIdx] = record;
+    } else {
+      return;
+    }
+  } else {
+    researchLibrary.push(record);
+  }
+
+  currentCaseSaved = true;
+  saveLibraryToStorage();
+  renderLibraryTable();
+  alert(`Saved "${patientName}" (Chart #${chartNo}) to MaQ Tracer Library!`);
+});
+
+function renderLibraryTable() {
+  const q = searchLibInput.value.trim().toLowerCase();
+  libraryTableBody.innerHTML = '';
+
+  const filtered = researchLibrary.filter(r =>
+    r.patientName.toLowerCase().includes(q) || r.chartNo.toLowerCase().includes(q)
+  );
+
+  if (filtered.length === 0) {
+    libraryTableBody.innerHTML = `<tr><td colspan="11" style="color:#94a3b8; padding:18px;">No saved patient records found in MaQ Tracer. Trace an X-ray and click "Save Patient to Research Library".</td></tr>`;
+    return;
+  }
+
+  filtered.forEach((r, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${idx + 1}</td>
+      <td><strong>${r.chartNo}</strong></td>
+      <td dir="auto" style="font-weight:600;">${r.patientName}</td>
+      <td>${r.age} / ${r.gender}</td>
+      <td class="pill-r">${r.R_Condyle} ${r.R_Condyle_Px ? `<br><small>(${r.R_Condyle_Px}px)</small>` : ''}</td>
+      <td class="pill-l">${r.L_Condyle} ${r.L_Condyle_Px ? `<br><small>(${r.L_Condyle_Px}px)</small>` : ''}</td>
+      <td class="pill-r">${r.R_Coronoid} ${r.R_Coronoid_Px ? `<br><small>(${r.R_Coronoid_Px}px)</small>` : ''}</td>
+      <td class="pill-l">${r.L_Coronoid} ${r.L_Coronoid_Px ? `<br><small>(${r.L_Coronoid_Px}px)</small>` : ''}</td>
+      <td class="pill-r">${r.R_Notch} ${r.R_Notch_Px ? `<br><small>(${r.R_Notch_Px}px)</small>` : ''}</td>
+      <td class="pill-l">${r.L_Notch} ${r.L_Notch_Px ? `<br><small>(${r.L_Notch_Px}px)</small>` : ''}</td>
+      <td>
+        <div class="btn-row">
+          <button class="secondary" onclick="loadPatientFromLibrary('${r.id}')" style="padding:4px 8px; font-size:0.74rem;">📂 Load</button>
+          <button class="danger" onclick="deletePatientFromLibrary('${r.id}')" style="padding:4px 8px; font-size:0.74rem;">✖</button>
+        </div>
+      </td>
+    `;
+    libraryTableBody.appendChild(tr);
+  });
+}
+
+window.loadPatientFromLibrary = function(id) {
+  const rec = researchLibrary.find(r => r.id === id);
+  if (!rec) return;
+  patientIdInput.value = rec.chartNo;
+  patientNameInput.value = rec.patientName;
+  patientAgeInput.value = rec.age !== '—' ? rec.age : '';
+  patientGenderInput.value = rec.gender;
+  if (rec.rawTracings) {
+    tracings = JSON.parse(JSON.stringify(rec.rawTracings));
+    currentCaseSaved = true;
+    refreshTableUI();
+    updateSelectionUI();
+    redraw();
+  }
+  libraryModal.classList.remove('open');
+};
+
+window.deletePatientFromLibrary = function(id) {
+  if (!confirm("Delete this patient record from the MaQ Tracer library?")) return;
+  researchLibrary = researchLibrary.filter(r => r.id !== id);
+  saveLibraryToStorage();
+  renderLibraryTable();
+};
+
+document.getElementById('openLibraryBtn').addEventListener('click', () => {
+  renderLibraryTable();
+  libraryModal.classList.add('open');
+});
+document.getElementById('closeLibraryBtn').addEventListener('click', () => {
+  libraryModal.classList.remove('open');
+});
+searchLibInput.addEventListener('input', renderLibraryTable);
+
+document.getElementById('clearLibraryBtn').addEventListener('click', () => {
+  if (!confirm("Are you sure you want to permanently clear all saved patients in the MaQ Tracer library?")) return;
+  researchLibrary = [];
+  saveLibraryToStorage();
+  renderLibraryTable();
+});
+
+function exportLibraryToCSV() {
+  if (researchLibrary.length === 0) {
+    return alert("Your MaQ Tracer Research Library is empty. Click 'Save Patient to Research Library' first.");
+  }
+
+  const escapeCsv = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+
+  const headers = [
+    "Chart_No", "Patient_Name", "Age", "Gender", "Date_Analyzed",
+    "R_Condyle_Shape", "R_Condyle_Length_Px", "R_Condyle_AspectRatio",
+    "L_Condyle_Shape", "L_Condyle_Length_Px", "L_Condyle_AspectRatio",
+    "R_Coronoid_Shape", "R_Coronoid_Length_Px",
+    "L_Coronoid_Shape", "L_Coronoid_Length_Px",
+    "R_SigmoidNotch_Shape", "R_SigmoidNotch_Length_Px",
+    "L_SigmoidNotch_Shape", "L_SigmoidNotch_Length_Px",
+    "Software_Version"
+  ].join(",");
+
+  const rows = researchLibrary.map(r => [
+    r.chartNo, r.patientName, r.age, r.gender, r.dateSaved,
+    r.R_Condyle, r.R_Condyle_Px, r.R_Condyle_HW,
+    r.L_Condyle, r.L_Condyle_Px, r.L_Condyle_HW,
+    r.R_Coronoid, r.R_Coronoid_Px,
+    r.L_Coronoid, r.L_Coronoid_Px,
+    r.R_Notch, r.R_Notch_Px,
+    r.L_Notch, r.L_Notch_Px,
+    "MaQ Tracer (© MaqaTech 2026)"
+  ].map(escapeCsv).join(",")).join("\n");
+
+  const csvContent = "\uFEFF" + headers + "\n" + rows;
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `MaQ_Tracer_MaqaTech_2026_Database_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+document.getElementById('exportCsvBtn').addEventListener('click', exportLibraryToCSV);
+document.getElementById('modalExportCsvBtn').addEventListener('click', exportLibraryToCSV);
+
+document.getElementById('exportJsonBtn').addEventListener('click', () => {
+  if (researchLibrary.length === 0) return alert("No records to backup.");
+  const backupPayload = {
+    software: "MaQ Tracer",
+    copyright: "© 2026 MaqaTech",
+    exportedAt: new Date().toISOString(),
+    records: researchLibrary
+  };
+  const blob = new Blob([JSON.stringify(backupPayload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `MaQ_Tracer_MaqaTech_2026_Backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+});
+
+document.getElementById('importJsonBtn').addEventListener('click', () => {
+  document.getElementById('jsonLoader').click();
+});
+
+document.getElementById('jsonLoader').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const parsed = JSON.parse(ev.target.result);
+      const imported = Array.isArray(parsed) ? parsed : (parsed.records || []);
+      if (Array.isArray(imported)) {
+        researchLibrary = imported;
+        saveLibraryToStorage();
+        renderLibraryTable();
+        alert(`Successfully restored ${imported.length} patient records into MaQ Tracer!`);
+      }
+    } catch (err) {
+      alert("Invalid JSON backup file.");
+    }
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('saveImgBtn').addEventListener('click', () => {
+  if (!imageLoaded) return alert("Load an X-ray image first.");
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = img.width;
+  outCanvas.height = img.height;
+  const oCtx = outCanvas.getContext('2d');
+  oCtx.drawImage(img, 0, 0);
+
+  Object.keys(tracings).forEach(key => {
+    const t = tracings[key];
+    if (t.points.length < 2) return;
+    oCtx.strokeStyle = '#ffffff';
+    oCtx.lineWidth = 3;
+    oCtx.beginPath();
+    oCtx.moveTo(t.points[0].x, t.points[0].y);
+    for (let i = 0; i < t.points.length - 1; i++) {
+      const xc = (t.points[i].x + t.points[i + 1].x) / 2;
+      const yc = (t.points[i].y + t.points[i + 1].y) / 2;
+      oCtx.quadraticCurveTo(t.points[i].x, t.points[i].y, xc, yc);
+    }
+    oCtx.lineTo(t.points[t.points.length - 1].x, t.points[t.points.length - 1].y);
+    oCtx.stroke();
+
+    if (t.points.length === 5 && t.metrics) {
+      oCtx.fillStyle = t.side === 'R' ? '#4ade80' : '#f87171';
+      oCtx.font = 'bold 15px sans-serif';
+      oCtx.fillText(`${t.metrics.arcLenPx} px`, t.points[2].x + 15, t.points[2].y + 40);
+    }
+  });
+
+  oCtx.fillStyle = 'rgba(9, 13, 22, 0.78)';
+  oCtx.fillRect(outCanvas.width - 285, outCanvas.height - 36, 275, 26);
+  oCtx.fillStyle = '#38bdf8';
+  oCtx.font = 'bold 14px sans-serif';
+  oCtx.fillText('MaQ Tracer | © 2026 MaqaTech', outCanvas.width - 273, outCanvas.height - 18);
+
+  const pName = patientNameInput.value.trim() || 'Patient';
+  const pId = patientIdInput.value.trim() || 'OPG';
+  const a = document.createElement('a');
+  a.href = outCanvas.toDataURL('image/png');
+  a.download = `MaQ_Tracer_${pId}_${pName}.png`;
+  a.click();
+});
+
+updateSelectionUI();
+</script>
+</body>
+</html>
